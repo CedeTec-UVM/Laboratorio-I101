@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>GDS-2202E · Guía de laboratorio</title>
+<meta name="description" content="Qué hace cada control del osciloscopio digital GW Instek GDS-2202E. Guía rápida de laboratorio.">
+<meta name="theme-color" content="#E4E1D6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121A24" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E4E1D6; --card:#F2F0E9; --ink:#16283F; --ink-2:#455670;
+  --rule:#C6C0B0; --muted:#6F7787; --live:#B03A22;
+  --lcd:#C6DDD6; --lcd-deep:#9FBDB4; --lcd-ink:#10231D;
+  --display:"Barlow Condensed",Impact,"Arial Narrow",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121A24; --card:#1B242F; --ink:#E6E9EC; --ink-2:#AFB7C0;
+        --rule:#2E3944; --muted:#8A939E; --live:#E8785A;}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;overflow-wrap:break-word}
+body.lock{overflow:hidden}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+.wrap{max-width:780px;margin:0 auto;padding:0 16px calc(56px + env(safe-area-inset-bottom))}
+a{color:var(--ink)}
+
+.hero{padding:22px 0 16px}
+.brand{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0}
+h1{font-family:var(--display);font-weight:700;text-transform:uppercase;
+   font-size:clamp(44px,13vw,92px);line-height:.85;margin:4px 0 8px}
+.tagline{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.05em;
+   font-size:clamp(17px,4.6vw,23px);line-height:1.15;margin:0 0 16px;color:var(--ink-2)}
+.strip{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);
+   border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.strip div{background:var(--bg);padding:9px 10px 10px}
+.strip dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 2px}
+.strip dd{margin:0;font-family:var(--mono);font-size:14px;font-weight:600}
+
+.jump{position:sticky;top:0;z-index:30;margin:0 -16px;
+  background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule)}
+.jump ul{display:flex;overflow-x:auto;list-style:none;margin:0;padding:0 10px;scrollbar-width:none}
+.jump ul::-webkit-scrollbar{display:none}
+.jump a{display:block;white-space:nowrap;padding:13px 11px;text-decoration:none;
+  font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.jump a:active{color:var(--ink)}
+
+section{margin-top:34px;scroll-margin-top:56px}
+.sec-head{display:flex;align-items:baseline;gap:10px;border-bottom:1.5px solid var(--ink);padding-bottom:6px;margin-bottom:14px}
+.sec-num{font-family:var(--mono);font-size:11px;color:var(--live);letter-spacing:.08em}
+h2{font-family:var(--display);font-weight:700;text-transform:uppercase;
+   font-size:clamp(25px,7vw,34px);line-height:1;margin:0}
+.lede{color:var(--ink-2);margin:0 0 16px;font-size:15.5px}
+
+.panel-box{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:8px}
+#panelHost svg.panel{width:100%;height:auto;display:block;touch-action:manipulation}
+.panel-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+.panel-bar p{margin:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.zoom-btn{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--ink);color:var(--bg);border:1px solid var(--ink);border-radius:999px;
+  padding:11px 18px;min-height:44px;cursor:pointer}
+.zoom-btn:active{opacity:.75}
+
+.ctl{cursor:pointer}
+.ctl .hit{fill:transparent}
+.ring{fill:none;stroke:#B03A22;stroke-width:3;opacity:0}
+.ctl.on .ring{opacity:1}
+.ctl.on .cap{fill:#FFE08A;stroke:#B03A22}
+.ctl:focus-visible{outline:none}
+.ctl:focus-visible .ring{opacity:1;stroke-dasharray:6 4}
+
+.fs{position:fixed;inset:0;z-index:100;background:#0C1219;
+  display:flex;align-items:center;justify-content:center;overscroll-behavior:contain;overflow:hidden}
+.fs[hidden]{display:none}
+.fs-rot{position:relative;line-height:0;width:100vw;flex:0 0 auto}
+@media (orientation:portrait){ .fs-rot{transform:rotate(90deg)} }
+.fs-rot svg.panel{display:block;width:100%;height:auto}
+.fs-close,.fs-tip{position:absolute;z-index:4;font-family:var(--mono);
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;line-height:1}
+.fs-close{top:2%;right:1.6%;background:#16283F;color:#EBE8DE;border:0;
+  border-radius:999px;padding:11px 16px;min-height:42px;cursor:pointer}
+.fs-close:active{opacity:.75}
+.fs-tip{left:1.6%;bottom:3%;color:#8FA0B4;pointer-events:none}
+
+.pop{position:absolute;z-index:3;background:var(--lcd);color:var(--lcd-ink);
+  border:1px solid #6E8880;border-radius:4px;padding:.75em .85em;line-height:1.4;
+  box-shadow:0 8px 26px rgba(0,0,0,.45);text-align:left}
+.pop[hidden]{display:none}
+.pop h4{margin:0 0 .3em;font-family:var(--display);font-weight:700;text-transform:uppercase;
+  font-size:1.3em;line-height:1.05;letter-spacing:.02em}
+.pop p{margin:0;font-size:1em}
+.pop .num{font-family:var(--mono);font-size:.75em;opacity:.65;letter-spacing:.1em;display:block;margin-bottom:.15em}
+.pop::after{content:"";position:absolute;width:.62em;height:.62em;background:var(--lcd);
+  border:1px solid #6E8880;transform:rotate(45deg)}
+.pop.pr::after{left:-.35em;top:calc(var(--cy,50%) - .31em);border-right:0;border-top:0}
+.pop.pl::after{right:-.35em;top:calc(var(--cy,50%) - .31em);border-left:0;border-bottom:0}
+.pop.pb::after{top:-.35em;left:calc(50% - .31em);border-right:0;border-bottom:0}
+.pop.pt::after{bottom:-.35em;left:calc(50% - .31em);border-left:0;border-top:0}
+
+.ctl-list{margin-top:18px}
+.grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--live);margin:26px 0 0;padding:0 0 7px;border-bottom:1.5px solid var(--ink);font-weight:600}
+.grp:first-child{margin-top:0}
+.row{border-bottom:1px solid var(--rule)}
+.row>summary{display:flex;align-items:center;gap:12px;list-style:none;cursor:pointer;padding:15px 4px;min-height:56px}
+.row>summary::-webkit-details-marker{display:none}
+.row>summary:active{background:var(--card)}
+.badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);min-width:26px}
+.nm{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.03em;
+  font-size:20px;line-height:1.05;flex:1}
+.chev{font-family:var(--mono);color:var(--muted);font-size:18px;line-height:1}
+.row[open] .chev,.row[open] .nm{color:var(--live)}
+
+.lcd{background:var(--lcd);color:var(--lcd-ink);border-radius:3px;padding:15px 15px 16px;margin:0 0 15px;
+  box-shadow:inset 0 0 0 3px rgba(0,0,0,.06);
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.04) 0 1px,transparent 1px 3px)}
+.lcd p{margin:0;font-size:15.5px;line-height:1.55}
+.lcd .tip{font-family:var(--mono);font-size:13.5px;line-height:1.5;
+  border-top:1px solid rgba(16,35,29,.3);padding-top:10px;margin-top:11px}
+.lcd .tip b{display:block;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  font-size:10.5px;opacity:.72;margin-bottom:3px}
+
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;border-top:1px solid var(--rule)}
+ol.steps li{counter-increment:s;padding:14px 0 15px 46px;border-bottom:1px solid var(--rule);position:relative}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:16px;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--live)}
+ol.steps b{font-weight:600}
+ol.steps span{display:block;color:var(--ink-2);font-size:15px;margin-top:3px}
+
+.bd{padding:0 0 20px}
+.bd p{margin:0 0 12px;font-size:15.5px;color:var(--ink-2)}
+.bd p b,.bd li b{color:var(--ink);font-weight:600}
+.bd ul{margin:0 0 14px;padding-left:19px}
+.bd li{margin-bottom:8px;font-size:15.5px;color:var(--ink-2)}
+
+.tbl{border-top:1px solid var(--ink);margin:0 0 16px}
+.tbl .r{display:grid;grid-template-columns:1fr;gap:1px 14px;padding:11px 0;border-bottom:1px solid var(--rule)}
+.tbl .k{font-family:var(--mono);font-size:13.5px;font-weight:600}
+.tbl .v{font-size:15px;color:var(--ink-2)}
+@media (min-width:560px){.tbl .r{grid-template-columns:minmax(150px,34%) 1fr}}
+.m{font-family:var(--mono);font-size:.9em;background:color-mix(in srgb,var(--ink) 9%,transparent);padding:1px 5px;border-radius:2px}
+
+.warn{border-left:3px solid var(--live);background:var(--card);padding:12px 14px;margin:0 0 15px}
+.warn b{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--live);display:block;margin-bottom:3px}
+.warn p{margin:0;font-size:15px}
+
+.top{display:block;margin:26px 0 0;text-align:center;font-family:var(--mono);font-size:12px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:14px}
+footer{margin-top:34px;border-top:1.5px solid var(--ink);padding-top:14px;
+  font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.75}
+
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .jump,.panel-bar,.top,.fs{display:none}
+  .lcd{background:#fff;color:#000;box-shadow:none;border:1px solid #999;background-image:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero" id="top">
+  <p class="brand">GW Instek · Laboratorio UVM</p>
+  <h1>GDS-2202E</h1>
+  <p class="tagline">Osciloscopio digital de almacenamiento</p>
+  <dl class="strip">
+    <div><dt>Ancho de banda</dt><dd>200 MHz</dd></div>
+    <div><dt>Muestreo</dt><dd>1 GSa/s</dd></div>
+    <div><dt>Canales</dt><dd>2 + EXT TRIG</dd></div>
+    <div><dt>Memoria</dt><dd>10 M puntos</dd></div>
+  </dl>
+</header>
+
+<nav class="jump" aria-label="Secciones">
+  <ul>
+    <li><a href="#panel">Controles</a></li>
+    <li><a href="#pasos">Primeros pasos</a></li>
+    <li><a href="#punta">La punta ×10</a></li>
+    <li><a href="#disparo">Disparo</a></li>
+    <li><a href="#medir">Medir</a></li>
+    <li><a href="#canal">Canal</a></li>
+    <li><a href="#seguridad">Seguridad</a></li>
+    <li><a href="#limites">Límites</a></li>
+  </ul>
+</nav>
+
+<section id="panel">
+  <div class="sec-head"><span class="sec-num">01</span><h2>¿Qué hace este control?</h2></div>
+  <p class="lede">Toca un control en el panel, o ábrelo a pantalla completa para verlo en grande. La lista está agrupada por zonas, igual que el panel.</p>
+
+  <div class="panel-box">
+    <div id="panelHost">
+    <svg class="panel" id="svgPanel" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Panel frontal del osciloscopio GDS-2202E">
+      <defs>
+        <linearGradient id="kn" x1="0.25" y1="0" x2="0.6" y2="1">
+          <stop offset="0" stop-color="#DCDAD4"/><stop offset="0.6" stop-color="#BEBCB6"/><stop offset="1" stop-color="#9B9A95"/>
+        </linearGradient>
+        <linearGradient id="scr" x1="0" y1="0" x2="0.4" y2="1">
+          <stop offset="0" stop-color="#15191C"/><stop offset="1" stop-color="#0A0D0F"/>
+        </linearGradient>
+        <style>
+          .t{font-family:Helvetica,Arial,sans-serif;fill:#2A2C2E}
+          .tc{font-family:Helvetica,Arial,sans-serif;fill:#2A2C2E;text-anchor:middle;pointer-events:none}
+          .kl{font-family:Helvetica,Arial,sans-serif;fill:#2A2C2E;font-size:10px;text-anchor:middle;pointer-events:none}
+          .zn{font-family:Helvetica,Arial,sans-serif;fill:#2A2C2E;font-size:11px;font-weight:700;letter-spacing:1.2px;text-anchor:middle;pointer-events:none}
+          .mi{font-family:Helvetica,Arial,sans-serif;fill:#55585B;font-size:6.5px;text-anchor:middle;pointer-events:none}
+          .cap:not([fill]){fill:#EDEAE1} .cap:not([stroke]){stroke:#B5B0A3} .cap{stroke-width:1}
+          .capr:not([fill]){fill:#DFDBD0} .capr:not([stroke]){stroke:#B0AB9E} .capr{stroke-width:1}
+        </style>
+      </defs>
+
+      <!-- carcasa -->
+      <rect x="4" y="4" width="992" height="492" rx="12" fill="#DFDACD" stroke="#A9A597"/>
+      <rect x="4" y="396" width="992" height="100" fill="#E6E2D7"/>
+      <line x1="4" y1="396" x2="996" y2="396" stroke="#A9A597"/>
+      <rect x="40" y="488" width="180" height="10" rx="3" fill="#8E8B80"/>
+      <rect x="780" y="488" width="180" height="10" rx="3" fill="#8E8B80"/>
+
+      <!-- bisel de la pantalla -->
+      <rect x="10" y="10" width="582" height="382" rx="9" fill="#6B6F74" stroke="#4E5257"/>
+      <text class="t" x="26" y="40" font-size="16" font-weight="700" fill="#EFEDE7">GW INSTEK</text>
+      <text class="t" x="140" y="40" font-size="17" font-weight="700" fill="#EFEDE7">GDS-2202E</text>
+      <text class="t" x="330" y="30" font-size="8" fill="#D6D3CC">Digital Storage Oscilloscope</text>
+      <text class="t" x="330" y="42" font-size="8" fill="#D6D3CC">200 MHz   1 GS/s</text>
+      <rect x="424" y="22" width="96" height="24" rx="12" fill="#E8801F"/>
+      <text class="tc" x="472" y="39" font-size="14" font-weight="700" fill="#FFF" font-style="italic">VPO</text>
+      <text class="tc" x="472" y="54" font-size="6" fill="#D6D3CC">Visual Persistence Oscilloscope</text>
+
+      <!-- 01 PANTALLA -->
+      <g class="ctl" data-id="lcd" role="button" tabindex="0" aria-label="Pantalla">
+        <rect class="ring" x="34" y="51" width="510" height="283" rx="4"/>
+        <rect class="cap" x="39" y="55" width="500" height="275" fill="url(#scr)" stroke="#2A2E31"/>
+        <g stroke="#2C3A33" stroke-width="0.7" opacity=".85">
+          <line x1="89" y1="55" x2="89" y2="330"/><line x1="139" y1="55" x2="139" y2="330"/>
+          <line x1="189" y1="55" x2="189" y2="330"/><line x1="239" y1="55" x2="239" y2="330"/>
+          <line x1="289" y1="55" x2="289" y2="330"/><line x1="339" y1="55" x2="339" y2="330"/>
+          <line x1="389" y1="55" x2="389" y2="330"/><line x1="439" y1="55" x2="439" y2="330"/>
+          <line x1="489" y1="55" x2="489" y2="330"/>
+          <line x1="39" y1="82" x2="539" y2="82"/><line x1="39" y1="110" x2="539" y2="110"/>
+          <line x1="39" y1="138" x2="539" y2="138"/><line x1="39" y1="165" x2="539" y2="165"/>
+          <line x1="39" y1="192" x2="539" y2="192"/><line x1="39" y1="220" x2="539" y2="220"/>
+          <line x1="39" y1="248" x2="539" y2="248"/><line x1="39" y1="275" x2="539" y2="275"/>
+          <line x1="39" y1="303" x2="539" y2="303"/>
+        </g>
+        <path d="M60 220 L110 220 L110 140 L185 140 L185 220 L260 220 L260 140 L335 140 L335 220 L410 220 L410 140 L485 140 L485 220 L525 220"
+              fill="none" stroke="#E8C22A" stroke-width="2.2"/>
+        <text class="t" x="48" y="70" font-size="9" fill="#8FE0C8">Trig'd</text>
+        <text class="t" x="48" y="322" font-size="8.5" fill="#E8C22A">CH1  1V/div</text>
+        <text class="t" x="300" y="322" font-size="8.5" fill="#9FB4C8">H 500us  T 1.20V</text>
+        <rect class="hit" x="34" y="51" width="510" height="283"/>
+      </g>
+
+      <!-- 02 TECLAS INFERIORES -->
+      <g class="ctl" data-id="bottomkeys" role="button" tabindex="0" aria-label="Teclas inferiores de menú">
+        <rect class="ring" x="35" y="352" width="504" height="30" rx="4"/>
+        <rect class="cap" x="39" y="356" width="64" height="22" rx="3"/>
+        <rect class="cap" x="111" y="356" width="64" height="22" rx="3"/>
+        <rect class="cap" x="183" y="356" width="64" height="22" rx="3"/>
+        <rect class="cap" x="255" y="356" width="64" height="22" rx="3"/>
+        <rect class="cap" x="327" y="356" width="64" height="22" rx="3"/>
+        <rect class="cap" x="399" y="356" width="64" height="22" rx="3"/>
+        <rect class="cap" x="471" y="356" width="64" height="22" rx="3"/>
+        <rect class="hit" x="35" y="348" width="504" height="38"/>
+      </g>
+
+      <!-- 03 TECLAS LATERALES -->
+      <g class="ctl" data-id="sidekeys" role="button" tabindex="0" aria-label="Teclas laterales de menú">
+        <rect class="ring" x="546" y="84" width="36" height="204" rx="18"/>
+        <circle class="cap" cx="564" cy="102" r="15"/>
+        <circle class="cap" cx="564" cy="145" r="15"/>
+        <circle class="cap" cx="564" cy="187" r="15"/>
+        <circle class="cap" cx="564" cy="230" r="15"/>
+        <circle class="cap" cx="564" cy="272" r="15"/>
+        <rect class="hit" x="544" y="84" width="42" height="204"/>
+      </g>
+
+      <!-- 04 HARDCOPY -->
+      <g class="ctl" data-id="hardcopy" role="button" tabindex="0" aria-label="Tecla Hardcopy">
+        <circle class="ring" cx="564" cy="53" r="22"/>
+        <circle class="cap" cx="564" cy="53" r="15"/>
+        <text class="mi" x="564" y="30" fill="#D6D3CC">HARDCOPY</text>
+        <circle class="hit" cx="564" cy="53" r="24"/>
+      </g>
+
+      <!-- 05 MENU OFF / OPTION -->
+      <g class="ctl" data-id="menuoff" role="button" tabindex="0" aria-label="Menu Off y Option">
+        <rect class="ring" x="548" y="308" width="32" height="76" rx="16"/>
+        <text class="mi" x="562" y="308" fill="#D6D3CC">MENU OFF</text>
+        <circle class="cap" cx="564" cy="324" r="13"/>
+        <text class="mi" x="562" y="354" fill="#D6D3CC">OPTION</text>
+        <circle class="cap" cx="564" cy="368" r="13"/>
+        <rect class="hit" x="544" y="300" width="42" height="86"/>
+      </g>
+
+      <!-- ===== zona derecha ===== -->
+
+      <!-- 06 VARIABLE + Select -->
+      <g class="ctl" data-id="variable" role="button" tabindex="0" aria-label="Perilla VARIABLE y tecla Select">
+        <rect class="ring" x="606" y="20" width="58" height="130" rx="6"/>
+        <text class="zn" x="634" y="30">VARIABLE</text>
+        <circle cx="634" cy="58" r="18" fill="#3A3D40"/>
+        <circle class="cap" cx="634" cy="58" r="15" fill="#26292C" stroke="#141618"/>
+        <line x1="634" y1="46" x2="634" y2="52" stroke="#C8CBCE" stroke-width="2"/>
+        <path d="M622 78 L614 118" stroke="#8E8B80" stroke-width="1.2" fill="none"/>
+        <rect class="cap" x="611" y="124" width="46" height="22" rx="11"/>
+        <text class="kl" x="634" y="139" font-size="9">Select</text>
+        <rect class="hit" x="602" y="20" width="66" height="130"/>
+      </g>
+
+      <!-- 07 TECLAS DE FUNCIÓN -->
+      <g class="ctl" data-id="funcs" role="button" tabindex="0" aria-label="Teclas de función">
+        <rect class="ring" x="671" y="29" width="255" height="66" rx="6"/>
+        <rect class="cap" x="675" y="33" width="52" height="22" rx="11"/><text class="kl" x="701" y="48" font-size="8.5">Measure</text>
+        <rect class="cap" x="740" y="33" width="52" height="22" rx="11"/><text class="kl" x="766" y="48" font-size="8.5">Cursor</text>
+        <rect class="cap" x="805" y="33" width="52" height="22" rx="11"/><text class="kl" x="831" y="48" font-size="8.5">APP</text>
+        <rect class="cap" x="870" y="33" width="52" height="22" rx="11"/><text class="kl" x="896" y="48" font-size="8.5">Acquire</text>
+        <rect class="cap" x="675" y="69" width="52" height="22" rx="11"/><text class="kl" x="701" y="84" font-size="8.5">Display</text>
+        <rect class="cap" x="740" y="69" width="52" height="22" rx="11"/><text class="kl" x="766" y="84" font-size="8.5">Help</text>
+        <rect class="cap" x="805" y="69" width="52" height="22" rx="11"/><text class="kl" x="831" y="84" font-size="7.5">Save/Recall</text>
+        <rect class="cap" x="870" y="69" width="52" height="22" rx="11"/><text class="kl" x="896" y="84" font-size="8.5">Utility</text>
+        <rect class="hit" x="671" y="29" width="255" height="66"/>
+      </g>
+
+      <!-- 08 AUTOSET -->
+      <g class="ctl" data-id="autoset" role="button" tabindex="0" aria-label="Tecla Autoset">
+        <rect class="ring" x="932" y="29" width="58" height="30" rx="6"/>
+        <rect class="cap" x="936" y="33" width="50" height="22" rx="5" fill="#1B62B5" stroke="#12457F"/>
+        <text class="kl" x="961" y="48" font-size="9" fill="#FFF">Autoset</text>
+        <rect class="hit" x="930" y="29" width="62" height="30"/>
+      </g>
+
+      <!-- 09 RUN/STOP + SINGLE -->
+      <g class="ctl" data-id="runstop" role="button" tabindex="0" aria-label="Run Stop y Single">
+        <rect class="ring" x="932" y="63" width="58" height="64" rx="6"/>
+        <rect class="capr" x="936" y="67" width="50" height="22" rx="5"/><text class="kl" x="961" y="82" font-size="8">Run/Stop</text>
+        <rect class="capr" x="936" y="101" width="50" height="22" rx="5"/><text class="kl" x="961" y="116" font-size="9">Single</text>
+        <rect class="hit" x="930" y="63" width="62" height="64"/>
+      </g>
+
+      <!-- 10 DEFAULT -->
+      <g class="ctl" data-id="default" role="button" tabindex="0" aria-label="Tecla Default">
+        <rect class="ring" x="932" y="131" width="58" height="30" rx="6"/>
+        <rect class="capr" x="936" y="135" width="50" height="22" rx="5"/>
+        <text class="kl" x="961" y="150" font-size="9">Default</text>
+        <rect class="hit" x="930" y="131" width="62" height="30"/>
+      </g>
+
+      <!-- marco HORIZONTAL -->
+      <path d="M658 105 L658 182 L928 182 L928 105" fill="none" stroke="#A9A597"/>
+      <path d="M658 105 L742 105 M844 105 L928 105" stroke="#A9A597" fill="none"/>
+      <text class="zn" x="793" y="109">HORIZONTAL</text>
+
+      <!-- 11 POSITION horizontal -->
+      <g class="ctl" data-id="hpos" role="button" tabindex="0" aria-label="Perilla POSITION horizontal">
+        <circle class="ring" cx="789" cy="150" r="32"/>
+        <text class="kl" x="789" y="127" font-size="8.5">◁ POSITION ▷</text>
+        <circle cx="789" cy="151" r="25" fill="#8E8B85"/>
+        <circle class="cap" cx="789" cy="150" r="24" fill="url(#kn)" stroke="#8E8B85"/>
+        <circle cx="789" cy="150" r="14" fill="none" stroke="#A8A6A1"/>
+        <line x1="789" y1="129" x2="789" y2="137" stroke="#6E6C67" stroke-width="2"/>
+        <circle class="hit" cx="789" cy="150" r="30"/>
+      </g>
+
+      <!-- 12 SCALE horizontal -->
+      <g class="ctl" data-id="hscale" role="button" tabindex="0" aria-label="Perilla SCALE horizontal">
+        <circle class="ring" cx="894" cy="150" r="32"/>
+        <text class="kl" x="894" y="120" font-size="9" font-weight="700">SCALE</text>
+        <circle cx="894" cy="151" r="25" fill="#8E8B85"/>
+        <circle class="cap" cx="894" cy="150" r="24" fill="url(#kn)" stroke="#8E8B85"/>
+        <circle cx="894" cy="150" r="14" fill="none" stroke="#A8A6A1"/>
+        <line x1="894" y1="129" x2="894" y2="137" stroke="#6E6C67" stroke-width="2"/>
+        <circle class="hit" cx="894" cy="150" r="30"/>
+      </g>
+
+      <!-- 13 ZOOM / PLAY / SEARCH -->
+      <g class="ctl" data-id="zoomsearch" role="button" tabindex="0" aria-label="Zoom, Play Pause, Search y flechas">
+        <rect class="ring" x="655" y="118" width="205" height="58" rx="5"/>
+        <rect class="cap" x="657" y="140" width="28" height="20" rx="4"/><text class="kl" x="671" y="154" font-size="10">←</text>
+        <rect class="cap" x="691" y="122" width="44" height="20" rx="10"/><text class="kl" x="713" y="136" font-size="8.5">Search</text>
+        <rect class="cap" x="691" y="152" width="44" height="20" rx="10"/><text class="kl" x="713" y="166" font-size="7.5">Set/Clear</text>
+        <rect class="cap" x="737" y="140" width="26" height="20" rx="4"/><text class="kl" x="750" y="154" font-size="10">→</text>
+        <rect class="cap" x="816" y="122" width="44" height="20" rx="10"/><text class="kl" x="838" y="136" font-size="8.5">Zoom</text>
+        <rect class="cap" x="816" y="152" width="44" height="20" rx="10"/><text class="kl" x="838" y="166" font-size="9">►/❙❙</text>
+        <rect class="hit" x="655" y="118" width="110" height="58"/>
+        <rect class="hit" x="812" y="118" width="52" height="58"/>
+      </g>
+
+      <!-- marco VERTICAL -->
+      <path d="M604 190 L604 390 L756 390 L756 190" fill="none" stroke="#A9A597"/>
+      <path d="M604 190 L638 190 M706 190 L756 190" stroke="#A9A597" fill="none"/>
+      <text class="zn" x="671" y="194">VERTICAL</text>
+
+      <!-- 14 POSITION vertical -->
+      <g class="ctl" data-id="vpos" role="button" tabindex="0" aria-label="Perillas POSITION verticales">
+        <rect class="ring" x="604" y="198" width="152" height="62" rx="5"/>
+        <text class="kl" x="628" y="208" font-size="8">POSITION</text>
+        <text class="kl" x="713" y="208" font-size="8">POSITION</text>
+        <circle cx="628" cy="230" r="21" fill="#8E8B85"/>
+        <circle class="cap" cx="628" cy="229" r="20" fill="url(#kn)" stroke="#8E8B85"/>
+        <circle cx="713" cy="230" r="21" fill="#8E8B85"/>
+        <circle class="cap" cx="713" cy="229" r="20" fill="url(#kn)" stroke="#8E8B85"/>
+        <text class="mi" x="628" y="256">PUSH TO ZERO</text>
+        <text class="mi" x="713" y="256">PUSH TO ZERO</text>
+        <rect class="hit" x="604" y="198" width="46" height="62"/>
+        <rect class="hit" x="690" y="198" width="48" height="62"/>
+      </g>
+
+      <!-- 15 MATH / REF / BUS -->
+      <g class="ctl" data-id="mrb" role="button" tabindex="0" aria-label="Teclas MATH, REF y BUS">
+        <rect class="ring" x="653" y="212" width="34" height="112" rx="17"/>
+        <text class="mi" x="670" y="222">MATH</text>
+        <circle class="cap" cx="670" cy="238" r="12" fill="#E8A0B4" stroke="#BE7285"/>
+        <text class="kl" x="670" y="242" font-size="10" font-weight="700">M</text>
+        <text class="mi" x="670" y="258">REF</text>
+        <circle class="cap" cx="670" cy="274" r="12" fill="#F2F0EA" stroke="#B5B0A3"/>
+        <text class="kl" x="670" y="278" font-size="10" font-weight="700">R</text>
+        <text class="mi" x="670" y="294">BUS</text>
+        <circle class="cap" cx="670" cy="310" r="12" fill="#A8B4E0" stroke="#7784B5"/>
+        <text class="kl" x="670" y="314" font-size="10" font-weight="700">B</text>
+        <rect class="hit" x="653" y="212" width="34" height="112"/>
+      </g>
+
+      <!-- 16 CH1 / CH2 -->
+      <g class="ctl" data-id="chkeys" role="button" tabindex="0" aria-label="Teclas CH1 y CH2">
+        <rect class="ring" x="604" y="278" width="152" height="30" rx="5"/>
+        <rect class="cap" x="607" y="282" width="42" height="22" rx="11"/><text class="kl" x="628" y="297" font-size="9">CH1</text>
+        <rect class="cap" x="692" y="282" width="42" height="22" rx="11"/><text class="kl" x="713" y="297" font-size="9">CH2</text>
+        <rect class="hit" x="604" y="278" width="46" height="30"/>
+        <rect class="hit" x="690" y="278" width="48" height="30"/>
+      </g>
+
+      <!-- 17 SCALE vertical -->
+      <g class="ctl" data-id="vscale" role="button" tabindex="0" aria-label="Perillas SCALE verticales">
+        <rect class="ring" x="604" y="322" width="152" height="66" rx="5"/>
+        <text class="kl" x="626" y="332" font-size="8.5" font-weight="700">SCALE</text>
+        <text class="kl" x="711" y="332" font-size="8.5" font-weight="700">SCALE</text>
+        <circle cx="628" cy="361" r="23" fill="#8E8B85"/>
+        <circle class="cap" cx="628" cy="360" r="22" fill="url(#kn)" stroke="#8E8B85"/>
+        <circle cx="713" cy="361" r="23" fill="#8E8B85"/>
+        <circle class="cap" cx="713" cy="360" r="22" fill="url(#kn)" stroke="#8E8B85"/>
+        <circle cx="658" cy="348" r="3.2" fill="#E8C22A"/><circle cx="658" cy="360" r="3.2" fill="#E8C22A"/><circle cx="658" cy="372" r="3.2" fill="#E8C22A"/>
+        <circle cx="743" cy="348" r="3.2" fill="#2F7FD4"/><circle cx="743" cy="360" r="3.2" fill="#2F7FD4"/><circle cx="743" cy="372" r="3.2" fill="#2F7FD4"/>
+        <rect class="hit" x="604" y="322" width="50" height="66"/>
+        <rect class="hit" x="688" y="322" width="52" height="66"/>
+      </g>
+
+      <!-- marco TRIGGER -->
+      <path d="M918 190 L918 386 L982 386 L982 190" fill="none" stroke="#A9A597"/>
+      <text class="zn" x="950" y="194" font-size="10">TRIGGER</text>
+
+      <!-- 18 TRIGGER LEVEL -->
+      <g class="ctl" data-id="trglevel" role="button" tabindex="0" aria-label="Perilla TRIGGER LEVEL">
+        <circle class="ring" cx="950" cy="230" r="30"/>
+        <text class="kl" x="950" y="209" font-size="8.5">LEVEL</text>
+        <circle cx="950" cy="231" r="21" fill="#8E8B85"/>
+        <circle class="cap" cx="950" cy="230" r="20" fill="url(#kn)" stroke="#8E8B85"/>
+        <line x1="950" y1="213" x2="950" y2="220" stroke="#6E6C67" stroke-width="2"/>
+        <text class="mi" x="950" y="258">PUSH TO ZERO</text>
+        <circle class="hit" cx="950" cy="232" r="32"/>
+      </g>
+
+      <!-- 19 teclas de disparo -->
+      <g class="ctl" data-id="trgkeys" role="button" tabindex="0" aria-label="Teclas Menu, 50 por ciento y Force Trig">
+        <rect class="ring" x="922" y="278" width="56" height="102" rx="5"/>
+        <rect class="cap" x="926" y="282" width="48" height="22" rx="11"/><text class="kl" x="950" y="297" font-size="9">Menu</text>
+        <rect class="cap" x="926" y="318" width="48" height="22" rx="11"/><text class="kl" x="950" y="333" font-size="9">50 %</text>
+        <rect class="cap" x="926" y="354" width="48" height="22" rx="11"/><text class="kl" x="950" y="369" font-size="7.5">Force-Trig</text>
+        <rect class="hit" x="922" y="278" width="56" height="102"/>
+      </g>
+
+      <!-- ===== franja inferior ===== -->
+
+      <!-- 20 POWER -->
+      <g class="ctl" data-id="power" role="button" tabindex="0" aria-label="Botón POWER">
+        <circle class="ring" cx="71" cy="442" r="30"/>
+        <circle cx="71" cy="443" r="23" fill="#A9A69C"/>
+        <circle class="cap" cx="71" cy="442" r="22" fill="#EFEDE6" stroke="#A9A69C"/>
+        <text class="t" x="108" y="436" font-size="15" font-weight="700" letter-spacing="1">POWER</text>
+        <text class="t" x="112" y="460" font-size="9">▮ I</text>
+        <text class="t" x="146" y="460" font-size="9">▮ o</text>
+        <circle class="hit" cx="71" cy="442" r="34"/>
+      </g>
+
+      <!-- 21 USB + compensación -->
+      <g class="ctl" data-id="probecomp" role="button" tabindex="0" aria-label="Puerto USB y salida de compensación de puntas">
+        <rect class="ring" x="500" y="418" width="122" height="58" rx="5"/>
+        <text class="tc" x="500" y="424" font-size="9">USB</text>
+        <rect class="cap" x="506" y="428" width="54" height="30" rx="2" fill="#D2CEC3" stroke="#A9A597"/>
+        <rect x="511" y="433" width="44" height="20" rx="1" fill="#2A2C2E"/>
+        <rect x="514" y="443" width="38" height="7" fill="#D2CEC3"/>
+        <rect class="cap" x="566" y="428" width="14" height="13" rx="1" fill="#C9C5BA" stroke="#8E8B80"/>
+        <rect class="cap" x="566" y="445" width="14" height="13" rx="1" fill="#C9C5BA" stroke="#8E8B80"/>
+        <text class="t" x="586" y="436" font-size="10" font-weight="700">2V</text>
+        <path d="M604 428 L604 434 L610 434 L610 428 L616 428" fill="none" stroke="#2A2C2E" stroke-width="1.4"/>
+        <path d="M573 462 L573 468 M568 468 L578 468 M570 471 L576 471 M572 474 L574 474" stroke="#2A2C2E" stroke-width="1.2" fill="none"/>
+        <rect class="hit" x="500" y="418" width="122" height="58"/>
+      </g>
+
+      <!-- 22 entradas BNC -->
+      <g class="ctl" data-id="bnc" role="button" tabindex="0" aria-label="Entradas CH1, CH2 y EXT TRIG">
+        <rect class="ring" x="596" y="404" width="308" height="72" rx="6"/>
+        <text class="tc" x="628" y="416" font-size="13" font-weight="700">CH1</text>
+        <circle cx="628" cy="446" r="17" fill="#9B9891" stroke="#7A7770"/>
+        <circle class="cap" cx="628" cy="446" r="12" fill="#3A3D40" stroke="#222426"/>
+        <circle cx="628" cy="446" r="4" fill="#C3A24E"/>
+        <text class="tc" x="716" y="416" font-size="13" font-weight="700">CH2</text>
+        <circle cx="716" cy="446" r="17" fill="#9B9891" stroke="#7A7770"/>
+        <circle class="cap" cx="716" cy="446" r="12" fill="#3A3D40" stroke="#222426"/>
+        <circle cx="716" cy="446" r="4" fill="#C3A24E"/>
+        <text class="tc" x="862" y="416" font-size="13" font-weight="700">EXT  TRIG</text>
+        <circle cx="862" cy="446" r="17" fill="#9B9891" stroke="#7A7770"/>
+        <circle class="cap" cx="862" cy="446" r="12" fill="#3A3D40" stroke="#222426"/>
+        <circle cx="862" cy="446" r="4" fill="#C3A24E"/>
+        <text class="t" x="652" y="437" font-size="6">⚠ 1MΩ//16pF</text>
+        <text class="t" x="652" y="446" font-size="6">300Vpk MAX.</text>
+        <text class="t" x="652" y="455" font-size="6">CAT I</text>
+        <text class="t" x="886" y="437" font-size="6">⚠ 1MΩ//16pF</text>
+        <text class="t" x="886" y="446" font-size="6">300Vpk MAX.</text>
+        <text class="t" x="886" y="455" font-size="6">CAT I</text>
+        <rect class="hit" x="596" y="404" width="308" height="72"/>
+      </g>
+    </svg>
+    </div>
+    <div class="panel-bar">
+      <p>Toca un control</p>
+      <button class="zoom-btn" id="zoom" type="button">Ver en grande ⤢</button>
+    </div>
+  </div>
+
+  <div class="ctl-list">
+
+    <h3 class="grp">Pantalla y menús</h3>
+
+    <details class="row" id="c-lcd" data-short="8 pulgadas, 800×480. Arriba a la derecha el estado del disparo; abajo, la escala de cada canal. CH1 amarillo, CH2 azul."><summary><span class="badge">01</span><span class="nm">Pantalla</span><span class="chev">+</span></summary><div class="lcd">
+      <p>LCD de 8 pulgadas, 800 × 480. Además de la señal te muestra: arriba a la derecha el <b>estado del disparo</b> (Trig'd, Trig?, Auto o Stop), abajo la escala vertical de cada canal y la base de tiempo, y arriba la barra de memoria. Los colores no son decorativos: <b>CH1 es amarillo y CH2 azul</b>, igual que los puntitos junto a cada perilla SCALE.</p>
+      <div class="tip"><b>En la práctica</b>Antes de anotar una medida, revisa los números de abajo. Ahí está el V/div y el s/div que hacen que la lectura signifique algo.</div></div></details>
+
+    <details class="row" id="c-bottomkeys" data-short="Las 7 teclas debajo de la pantalla. Eligen la opción del menú que aparece justo encima de cada una."><summary><span class="badge">02</span><span class="nm">Teclas inferiores</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Las siete teclas debajo de la pantalla. No tienen función fija: eligen la opción del menú que aparece justo encima de cada una. Presionar una abre normalmente un submenú del lado derecho.</p>
+      <div class="tip"><b>En la práctica</b>Presionar otra vez la misma tecla cierra el menú que abriste.</div></div></details>
+
+    <details class="row" id="c-sidekeys" data-short="Las 5 teclas redondas a la derecha de la pantalla. Eligen el parámetro del submenú lateral."><summary><span class="badge">03</span><span class="nm">Teclas laterales</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Las cinco teclas redondas al costado derecho de la pantalla. Eligen el parámetro del submenú que aparece ahí. Cuando el parámetro trae un ícono de flecha circular, significa que ese valor se edita girando la perilla VARIABLE.</p>
+      <div class="tip"><b>En la práctica</b>El flujo casi siempre es el mismo: tecla de función → tecla inferior → tecla lateral → perilla VARIABLE → Select.</div></div></details>
+
+    <details class="row" id="c-menuoff" data-short="Menu Off esconde los menús de la pantalla. Una presión cierra el lateral, otra el inferior. Option es para funciones que se instalan aparte."><summary><span class="badge">04</span><span class="nm">Menu Off · Option</span><span class="chev">+</span></summary><div class="lcd">
+      <p><b>Menu Off</b> esconde los menús para que veas la señal completa: una presión cierra el menú lateral y otra el inferior. También quita los mensajes que aparecen en pantalla. <b>Option</b> es para funciones que se instalan aparte y normalmente no vas a usarla.</p>
+      <div class="tip"><b>En la práctica</b>Antes de tomar una foto de la pantalla para tu reporte, presiona Menu Off dos veces. Se ve mucho mejor sin los menús encima.</div></div></details>
+
+    <details class="row" id="c-variable" data-short="La perilla chica de arriba. Cambia el valor que esté resaltado en el menú; Select confirma."><summary><span class="badge">05</span><span class="nm">VARIABLE · Select</span><span class="chev">+</span></summary><div class="lcd">
+      <p>La perilla negra chica de arriba a la izquierda. Sube, baja o recorre el valor que esté resaltado en el menú, y la tecla <b>Select</b> confirma. Es la perilla que mueve los cursores cuando estás midiendo.</p>
+      <div class="tip"><b>En la práctica</b>Si giras VARIABLE y no pasa nada, es que no hay ningún parámetro seleccionado. Presiona primero la tecla lateral del valor que quieres cambiar.</div></div></details>
+
+    <details class="row" id="c-funcs" data-short="Measure, Cursor, APP, Acquire, Display, Help, Save/Recall y Utility. Cada una abre su menú abajo."><summary><span class="badge">06</span><span class="nm">Teclas de función</span><span class="chev">+</span></summary><div class="lcd">
+      <p>El bloque de ocho teclas ovaladas. <b>Measure</b> son las mediciones automáticas. <b>Cursor</b> son los cursores manuales. <b>Acquire</b> es el modo de adquisición y la longitud de registro. <b>Display</b> ajusta puntos o vectores, persistencia e intensidad. <b>Save/Recall</b> guarda pantallas, señales y configuraciones. <b>Utility</b> tiene idioma, fecha y la frecuencia de la salida de compensación. <b>APP</b> son aplicaciones como el voltímetro digital.</p>
+      <div class="tip"><b>En la práctica</b><b>Help</b> es la más subestimada: la presionas y luego cualquier tecla, y el equipo te explica en pantalla qué hace. Presiónala otra vez para salir.</div></div></details>
+
+    <details class="row" id="c-hardcopy" data-short="Guarda o imprime de un golpe lo que hay en pantalla. Se configura en Utility. El USB de abajo es donde va el archivo."><summary><span class="badge">07</span><span class="nm">Hardcopy · USB</span><span class="chev">+</span></summary><div class="lcd">
+      <p>La tecla redonda de hasta arriba, a la derecha de la pantalla. Es un guardado rápido: de un golpe guarda la imagen de la pantalla o los datos de la señal en la memoria USB que conectes abajo. Lo que hace exactamente se configura en <b>Utility</b>.</p>
+      <div class="tip"><b>En la práctica</b>Para tu reporte, esto es mucho mejor que tomarle foto a la pantalla con el celular. Trae tu USB al laboratorio.</div></div></details>
+
+    <h3 class="grp">Vertical · el eje de voltaje</h3>
+
+    <details class="row" id="c-chkeys" data-short="Activan y configuran cada canal. Se iluminan cuando el canal está encendido. Autoset NO los activa."><summary><span class="badge">08</span><span class="nm">CH1 · CH2</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Activan el canal y abren su menú: acoplamiento, atenuación de la punta, invertir, límite de ancho de banda. La tecla se ilumina cuando el canal está encendido. Para apagarlo, presiónala otra vez (si el menú estaba cerrado, la primera presión solo abre el menú).</p>
+      <div class="tip"><b>En la práctica</b>Autoset <b>no</b> activa los canales. Si conectaste una señal a CH2 y no aparece nada, lo más probable es que el canal esté apagado.</div></div></details>
+
+    <details class="row" id="c-vpos" data-short="Suben y bajan la señal en pantalla. Cada perilla mueve su canal. Presionarlas la regresa a cero."><summary><span class="badge">09</span><span class="nm">POSITION vertical</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Suben y bajan la señal en pantalla, una perilla por canal. <b>Presionar la perilla</b> regresa la señal al centro, que es lo que quieres cuando ya la perdiste de vista.</p>
+      <div class="tip"><b>En la práctica</b>Mover la señal no cambia la medición, solo dónde se dibuja. Sepáralas verticalmente cuando traigas dos canales para no confundirlas.</div></div></details>
+
+    <details class="row" id="c-vscale" data-short="Volts por división de cada canal, de 1 mV/div a 10 V/div. Los puntitos de color dicen qué perilla es de qué canal."><summary><span class="badge">10</span><span class="nm">SCALE vertical</span><span class="chev">+</span></summary><div class="lcd">
+      <p>El <b>volts por división</b> de cada canal, de 1 mV/div a 10 V/div en pasos 1-2-5. Los puntitos de color junto a cada perilla te dicen de qué canal es: amarillos para CH1, azules para CH2.</p>
+      <div class="tip"><b>En la práctica</b>Ajústalo para que la señal ocupe la mayor parte de la pantalla sin salirse. Una señal aplastada en dos cuadritos se mide con mucho más error.</div></div></details>
+
+    <details class="row" id="c-mrb" data-short="MATH suma, resta, multiplica o divide canales y hace FFT. REF guarda una señal de referencia. BUS decodifica I2C, SPI, UART, CAN y LIN."><summary><span class="badge">11</span><span class="nm">MATH · REF · BUS</span><span class="chev">+</span></summary><div class="lcd">
+      <p><b>MATH</b> (la rosa) opera entre canales: suma, resta, multiplica, divide y hace FFT para ver el espectro. <b>REF</b> (la blanca) guarda una señal para comparar contra ella después. <b>BUS</b> (la azul) decodifica protocolos serie como I²C, SPI, UART, CAN y LIN.</p>
+      <div class="tip"><b>En la práctica</b>MATH con resta (CH1 − CH2) es la forma correcta de medir el voltaje entre dos puntos que no son tierra. Conectar el caimán a un punto vivo no lo es.</div></div></details>
+
+    <h3 class="grp">Horizontal · el eje de tiempo</h3>
+
+    <details class="row" id="c-hscale" data-short="Base de tiempo, de 1 ns/div a 100 s/div. Es lo que decide cuántos ciclos ves en pantalla."><summary><span class="badge">12</span><span class="nm">SCALE horizontal</span><span class="chev">+</span></summary><div class="lcd">
+      <p>La <b>base de tiempo</b>, o segundos por división, de 1 ns/div a 100 s/div. Es lo que decide cuántos ciclos de la señal caben en pantalla. Afecta a los dos canales al mismo tiempo.</p>
+      <div class="tip"><b>En la práctica</b>Dos o tres ciclos en pantalla es lo cómodo para medir periodo. Veinte ciclos apretados solo sirven para ver la forma general.</div></div></details>
+
+    <details class="row" id="c-hpos" data-short="Corre la señal a izquierda y derecha. Presionarla la regresa al centro."><summary><span class="badge">13</span><span class="nm">POSITION horizontal</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Corre la señal a la izquierda y a la derecha, moviendo el punto de disparo respecto a la pantalla. <b>Presionar la perilla</b> lo regresa a cero.</p>
+      <div class="tip"><b>En la práctica</b>Sirve para ver qué pasó justo antes del disparo, moviendo la señal hacia la derecha.</div></div></details>
+
+    <details class="row" id="c-zoomsearch" data-short="Zoom parte la pantalla para ver un detalle sin perder el contexto. Search y las flechas buscan eventos dentro de la captura."><summary><span class="badge">14</span><span class="nm">Zoom · Play · Search</span><span class="chev">+</span></summary><div class="lcd">
+      <p><b>Zoom</b> parte la pantalla en dos: arriba la captura completa y abajo el pedazo ampliado, así ves el detalle sin perder el contexto. <b>Play/Pause</b> recorre la captura sola. <b>Search</b>, <b>Set/Clear</b> y las flechas buscan y marcan eventos dentro de lo que capturaste.</p>
+      <div class="tip"><b>En la práctica</b>Es funcionalidad avanzada. Para una práctica normal no la necesitas; si entraste sin querer, presiona Zoom otra vez para salir.</div></div></details>
+
+    <h3 class="grp">Disparo · trigger</h3>
+
+    <details class="row" id="c-trglevel" data-short="El voltaje al que el osciloscopio decide empezar a dibujar. Si la onda corre o parpadea, este nivel está fuera de la señal."><summary><span class="badge">15</span><span class="nm">TRIGGER LEVEL</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Fija el voltaje al que el osciloscopio decide empezar a dibujar. Si ese nivel queda fuera del rango de tu señal, el equipo nunca dispara y la onda se ve corriendo o parpadeando. <b>Presionar la perilla</b> lleva el nivel a cero.</p>
+      <div class="tip"><b>En la práctica</b>Esta es la causa número uno de "no me sale bien la señal". Si se mueve, presiona la tecla 50 % y se acomoda sola.</div></div></details>
+
+    <details class="row" id="c-trgkeys" data-short="Menu configura el disparo. 50 % pone el nivel a la mitad de la señal y arregla casi todo. Force-Trig dibuja aunque no haya disparo."><summary><span class="badge">16</span><span class="nm">Menu · 50 % · Force-Trig</span><span class="chev">+</span></summary><div class="lcd">
+      <p><b>Menu</b> abre la configuración del disparo: tipo, fuente, flanco, acoplamiento y modo. <b>50 %</b> pone el nivel justo a la mitad de la señal y arregla la mayoría de los casos. <b>Force-Trig</b> obliga al equipo a dibujar aunque no encuentre disparo, útil para ver si de plano no está llegando señal.</p>
+      <div class="tip"><b>En la práctica</b>Dentro de Menu, revisa que la <b>fuente</b> sea el canal donde está tu señal. Si tienes la señal en CH2 y el disparo apunta a CH1, nunca se va a estabilizar.</div></div></details>
+
+    <h3 class="grp">Adquisición</h3>
+
+    <details class="row" id="c-autoset" data-short="Acomoda solo escala y disparo. Es un punto de partida, no la respuesta. No funciona abajo de 20 Hz o 10 mV, y no activa canales."><summary><span class="badge">17</span><span class="nm">Autoset</span><span class="chev">+</span></summary><div class="lcd">
+      <p>La tecla azul. Acomoda automáticamente la escala vertical, la horizontal y el canal de disparo para que la señal se vea. Tiene dos modos que eliges en el menú de abajo: <b>Fit Screen</b>, que incluye la componente de DC, y <b>AC Priority</b>, que la quita.</p>
+      <div class="tip"><b>En la práctica</b>Es un punto de partida, no la respuesta. No funciona con señales abajo de 20 Hz o de 10 mV, y <b>no activa los canales</b>. Después de usarlo, ajusta tú las escalas. Si empeoró las cosas, en el menú de abajo aparece Undo Autoset.</div></div></details>
+
+    <details class="row" id="c-runstop" data-short="Run/Stop congela la señal para poder analizarla; se pone roja al congelar. Single captura un solo disparo y se detiene."><summary><span class="badge">18</span><span class="nm">Run/Stop · Single</span><span class="chev">+</span></summary><div class="lcd">
+      <p><b>Run/Stop</b> congela la señal en pantalla para que puedas medirla con calma. Se pone <b>roja</b> cuando está congelada y verde cuando está corriendo. <b>Single</b> arma el equipo para capturar <b>un solo disparo</b> y detenerse ahí: es la forma de atrapar un evento que pasa una sola vez.</p>
+      <div class="tip"><b>En la práctica</b>Congelada, la señal sigue siendo medible con cursores y con Measure, y puedes cambiar las escalas. Es la mejor forma de tomar datos sin que se te mueva.</div></div></details>
+
+    <details class="row" id="c-default" data-short="Regresa todo a la configuración de fábrica. Al encender, el equipo recupera cómo estaba antes de apagarlo, así que empieza tu práctica aquí."><summary><span class="badge">19</span><span class="nm">Default</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Regresa el osciloscopio a la configuración de fábrica. Importante: este equipo <b>no arranca limpio</b>, recupera el estado en el que quedó antes de apagarse, con todo lo que le haya dejado el equipo anterior.</p>
+      <div class="tip"><b>En la práctica</b>Empieza cada práctica presionando Default. Te ahorra media hora de pelear con una configuración rara que ni tú pusiste.</div></div></details>
+
+    <h3 class="grp">Conectores</h3>
+
+    <details class="row" id="c-bnc" data-short="Entradas CH1, CH2 y disparo externo. 1 MΩ // 16 pF, máximo 300 Vpk, categoría CAT I. La tierra de los tres es la misma."><summary><span class="badge">20</span><span class="nm">CH1 · CH2 · EXT TRIG</span><span class="chev">+</span></summary><div class="lcd">
+      <p>Las entradas. CH1 y CH2 son de <b>1 MΩ en paralelo con 16 pF</b>, con máximo de <b>300 V pico</b> y categoría <b>CAT I</b>. <b>EXT TRIG</b> no dibuja señal: solo sirve para que el equipo dispare con una señal externa, y aguanta ±15 V pico.</p>
+      <div class="tip"><b>En la práctica</b>La malla de los tres BNC está unida entre sí y a la tierra del enchufe. Lee la sección de seguridad antes de conectar dos puntas a la vez.</div></div></details>
+
+    <details class="row" id="c-probecomp" data-short="La salida 2V da una cuadrada de 2 Vpp a 1 kHz para compensar las puntas. El USB es para guardar pantallas y datos."><summary><span class="badge">21</span><span class="nm">Salida 2V · USB</span><span class="chev">+</span></summary><div class="lcd">
+      <p>La salida marcada <b>2V</b> entrega una onda cuadrada de 2 Vpp a 1 kHz, con su terminal de tierra al lado. No es un generador para tus prácticas: sirve para <b>compensar las puntas</b>. El puerto <b>USB</b> es para guardar imágenes y datos con la tecla Hardcopy.</p>
+      <div class="tip"><b>En la práctica</b>La frecuencia de esa salida se puede cambiar de 1 kHz a 200 kHz desde el menú Utility, pero para compensar déjala en 1 kHz.</div></div></details>
+
+    <details class="row" id="c-power" data-short="Botón grande de abajo a la izquierda. Tarda unos 30 segundos en arrancar."><summary><span class="badge">22</span><span class="nm">POWER</span><span class="chev">+</span></summary><div class="lcd">
+      <p>El botón redondo grande de abajo a la izquierda, marcado con <b>▮ I</b> para encendido y <b>▮ o</b> para apagado. La pantalla tarda alrededor de <b>30 segundos</b> en arrancar, así que no lo presiones dos veces creyendo que no prendió.</p>
+      <div class="tip"><b>En la práctica</b>Al encender recupera la configuración que tenía antes de apagarse. Presiona Default en cuanto arranque.</div></div></details>
+
+  </div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="pasos">
+  <div class="sec-head"><span class="sec-num">02</span><h2>Ver tu primera señal</h2></div>
+  <ol class="steps">
+    <li><b>Enciende y espera.</b><span>Unos 30 segundos hasta que aparezca la pantalla.</span></li>
+    <li><b>Presiona Default.</b><span>El equipo recupera la configuración del alumno anterior. Este paso te evita problemas que no son tuyos.</span></li>
+    <li><b>Conecta la punta a CH1 y ponla en ×10.</b><span>El switch está en el cuerpo de la punta. Luego dile al osciloscopio que está en ×10, o todas tus lecturas van a estar mal por un factor de diez.</span></li>
+    <li><b>Compensa la punta.</b><span>Con la salida 2V, una sola vez al empezar. Viene explicado en la siguiente sección.</span></li>
+    <li><b>Presiona CH1 para activar el canal.</b><span>La tecla se ilumina. Autoset no hace este paso por ti.</span></li>
+    <li><b>Conecta al circuito: punta a la señal, caimán a la tierra del circuito.</b><span>El caimán va a tierra, siempre. Nunca a un punto vivo.</span></li>
+    <li><b>Presiona Autoset.</b><span>La señal aparece centrada. Si no aparece nada, revisa que el canal esté activo y que la punta haga contacto.</span></li>
+    <li><b>Ajusta a mano.</b><span>SCALE vertical para que la señal llene la pantalla, SCALE horizontal para ver dos o tres ciclos. Si la onda corre, presiona 50 %.</span></li>
+  </ol>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="punta">
+  <div class="sec-head"><span class="sec-num">03</span><h2>La punta ×10</h2></div>
+  <p class="lede">El error más caro del laboratorio: mediciones diez veces equivocadas que nadie nota.</p>
+  <div class="bd">
+    <p>La punta trae un switch con <b>×1</b> y <b>×10</b>. En ×10 la punta divide la señal entre diez antes de entregarla al osciloscopio. Eso es bueno: carga menos tu circuito y te da todo el ancho de banda. Pero el osciloscopio <b>no se entera solo</b> de en qué posición está el switch.</p>
+    <div class="warn"><b>Los dos tienen que coincidir</b><p>Si la punta está en ×10 y el osciloscopio configurado en ×1, todo lo que midas va a ser diez veces más chico de lo real. Y al revés, diez veces más grande. La señal se ve perfecta y correcta; simplemente los números están mal.</p></div>
+    <p>Para configurarlo: <b>CH1 → Probe → Attenuation → Set to 10X</b>. Hazlo para cada canal que uses. Esto no cambia la señal, solo la escala con la que el equipo la reporta.</p>
+    <p><b>Compensar la punta</b> es distinto y también hay que hacerlo, una vez al empezar:</p>
+    <ul>
+      <li>Conecta la punta a CH1 y su gancho a la salida <b>2V</b>, con el caimán en la terminal de tierra de al lado.</li>
+      <li>Presiona <b>Autoset</b>. Debe aparecer una onda cuadrada de 1 kHz.</li>
+      <li>En <b>Display</b>, pon el modo en <b>Vector</b>.</li>
+      <li>Con un desarmador chico, gira el tornillo de ajuste de la punta hasta que <b>la parte de arriba de la cuadrada quede plana</b>.</li>
+      <li>Si las esquinas se ven picudas está sobrecompensada; si se ven redondeadas, subcompensada. Plana es correcta.</li>
+    </ul>
+    <p>Una punta sin compensar deforma todo lo que midas, sobre todo en flancos rápidos y en frecuencias altas. La punta que trae este equipo es la GTP-200B-4.</p>
+  </div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="disparo">
+  <div class="sec-head"><span class="sec-num">04</span><h2>El disparo</h2></div>
+  <p class="lede">Por qué la onda "corre" y cómo detenerla.</p>
+  <div class="bd">
+    <p>El osciloscopio dibuja la señal muchas veces por segundo. Para que las pasadas queden encimadas y la onda se vea quieta, necesita empezar siempre en el mismo punto de la señal. Ese punto es el <b>disparo</b>: un voltaje (el nivel) y un sentido (flanco de subida o de bajada).</p>
+    <p>Si el nivel de disparo queda fuera del rango de tu señal, el equipo nunca encuentra ese punto y la onda se ve corriendo, parpadeando o de plano no se actualiza.</p>
+    <div class="tbl">
+      <div class="r"><div class="k">Trig'd</div><div class="v">Disparando bien. La onda debe verse quieta.</div></div>
+      <div class="r"><div class="k">Trig?</div><div class="v">No está disparando y la pantalla no se actualiza. Revisa el nivel y la fuente.</div></div>
+      <div class="r"><div class="k">Auto</div><div class="v">Modo automático: dibuja aunque no dispare, por eso la onda corre.</div></div>
+      <div class="r"><div class="k">Stop</div><div class="v">Congelado con Run/Stop o con Single.</div></div>
+    </div>
+    <p><b>La receta de tres pasos</b> cuando la onda no se queda quieta:</p>
+    <ul>
+      <li>Presiona <b>50 %</b>. Pone el nivel a la mitad de la señal y resuelve la mayoría de los casos.</li>
+      <li>Si sigue, abre el <b>Menu</b> del trigger y revisa que la <b>fuente</b> sea el canal donde está tu señal.</li>
+      <li>Cambia el modo a <b>Normal</b>. Así solo dibuja cuando de verdad dispara, y si no ves nada es que el disparo está mal, no la señal.</li>
+    </ul>
+    <p>El modo <b>Auto</b> conviene mientras exploras, porque siempre te muestra algo. El modo <b>Normal</b> conviene cuando ya sabes qué buscas, porque no te engaña.</p>
+  </div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="medir">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Medir</h2></div>
+  <div class="bd">
+    <p><b>Mediciones automáticas.</b> Presiona <b>Measure</b> → <b>Add Measurement</b> y elige de las tres familias: <b>V/I</b> (pico a pico, máximo, mínimo, RMS, media, amplitud), <b>Time</b> (frecuencia, periodo, tiempo de subida y bajada, ancho de pulso, ciclo de trabajo) y <b>Delay</b> (desfase entre dos canales, incluida la fase en grados). Puedes tener hasta ocho en pantalla al mismo tiempo.</p>
+    <p><b>Cursores.</b> Presiona <b>Cursor</b> una vez para los horizontales y dos para los verticales. Se mueven con la perilla VARIABLE y la tecla Select cambia cuál de los dos estás moviendo. En pantalla aparece la diferencia entre ambos, que es lo que casi siempre te interesa.</p>
+    <p>Para elegir de qué canal mide, entra a <b>Source</b> en el menú lateral. El color del resultado te dice la fuente: amarillo es CH1 y azul CH2.</p>
+    <div class="warn"><b>Congela antes de anotar</b><p>Presiona Run/Stop antes de copiar los números a tu reporte. Con la señal viva los valores bailan y acabas anotando el de un instante cualquiera.</p></div>
+  </div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="canal">
+  <div class="sec-head"><span class="sec-num">06</span><h2>Ajustes del canal</h2></div>
+  <p class="lede">Lo que hay dentro del menú CH1 o CH2.</p>
+  <div class="bd">
+    <div class="tbl">
+      <div class="r"><div class="k">Coupling</div><div class="v"><b>DC</b> muestra la señal completa. <b>AC</b> quita la componente de DC, ideal para ver el rizado de una fuente sin que se te salga de pantalla. <b>GND</b> muestra solo la línea de cero volts, para saber dónde está el cero.</div></div>
+      <div class="r"><div class="k">Probe</div><div class="v">Atenuación de la punta (el ×10) y si la punta es de voltaje o de corriente.</div></div>
+      <div class="r"><div class="k">Bandwidth</div><div class="v">Limita el ancho de banda a 20 MHz o 100 MHz. Sirve para limpiar ruido de alta frecuencia cuando la señal se ve peluda.</div></div>
+      <div class="r"><div class="k">Invert</div><div class="v">Voltea la señal de cabeza. Útil para comparar dos señales en contrafase.</div></div>
+      <div class="r"><div class="k">Expand</div><div class="v">Si al cambiar el V/div la señal se expande desde tierra o desde el centro de la pantalla.</div></div>
+      <div class="r"><div class="k">Impedancia</div><div class="v">Fija en 1 MΩ, no se puede cambiar. Tenlo en cuenta si mides con un generador de 50 Ω.</div></div>
+    </div>
+  </div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="seguridad">
+  <div class="sec-head"><span class="sec-num">07</span><h2>Seguridad</h2></div>
+  <p class="lede">Esta sección es la que de verdad importa. Léela completa una vez.</p>
+  <div class="bd">
+    <div class="warn"><b>Los caimanes están todos unidos a tierra</b><p>La malla de los tres BNC está conectada entre sí y a la tierra física del enchufe. Si pones el caimán de CH1 en un punto y el de CH2 en otro punto distinto del circuito, <b>estás cortocircuitando esos dos puntos a través del osciloscopio</b>. Es la forma más común de quemar un circuito, una fuente, o el propio osciloscopio.</p></div>
+    <ul>
+      <li><b>Los dos caimanes van al mismo punto de referencia</b>, siempre. Si necesitas medir el voltaje entre dos puntos que no son tierra, conecta una punta a cada uno y usa <b>MATH</b> con la resta CH1 − CH2.</li>
+      <li><b>Máximo 300 V pico</b> en las entradas. No se lo brinques ni "un ratito".</li>
+      <li><b>Categoría CAT I.</b> Este osciloscopio <b>no</b> es para medir en el contacto de pared ni en la instalación eléctrica del edificio. Solo circuitos que no estén conectados directamente a la red.</li>
+      <li>Nunca conectes un voltaje peligroso al lado de tierra del BNC: puede provocar fuego y descarga eléctrica.</li>
+      <li>El equipo debe estar en un contacto con tierra. Sin ese aterrizaje el chasis puede quedar flotando.</li>
+      <li>No tapes el ventilador ni pongas cosas encima del osciloscopio.</li>
+      <li>Usa conectores, no cables pelados metidos en las entradas.</li>
+    </ul>
+  </div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<section id="limites">
+  <div class="sec-head"><span class="sec-num">08</span><h2>Límites</h2></div>
+  <div class="bd"><div class="tbl">
+    <div class="r"><div class="k">Ancho de banda</div><div class="v">200 MHz, 2 canales</div></div>
+    <div class="r"><div class="k">Muestreo</div><div class="v">1 GSa/s en tiempo real</div></div>
+    <div class="r"><div class="k">Memoria</div><div class="v">10 M puntos de longitud de registro</div></div>
+    <div class="r"><div class="k">Escala vertical</div><div class="v">1 mV/div a 10 V/div, pasos 1-2-5</div></div>
+    <div class="r"><div class="k">Base de tiempo</div><div class="v">1 ns/div a 100 s/div, pasos 1-2-5</div></div>
+    <div class="r"><div class="k">Entradas CH1 y CH2</div><div class="v">1 MΩ // 16 pF · 300 V pico máx. · CAT I</div></div>
+    <div class="r"><div class="k">EXT TRIG</div><div class="v">1 MΩ // 16 pF · ± 15 V pico</div></div>
+    <div class="r"><div class="k">Límite de ancho de banda</div><div class="v">Full, 100 MHz o 20 MHz</div></div>
+    <div class="r"><div class="k">Salida de compensación</div><div class="v">2 Vpp cuadrada, 1 kHz por defecto (ajustable de 1 kHz a 200 kHz)</div></div>
+    <div class="r"><div class="k">Pantalla</div><div class="v">8 pulgadas, 800 × 480, TFT a color</div></div>
+    <div class="r"><div class="k">Captura</div><div class="v">120 000 formas de onda por segundo</div></div>
+    <div class="r"><div class="k">Alimentación</div><div class="v">100 a 240 V CA, 50/60 Hz, 30 W</div></div>
+    <div class="r"><div class="k">Punta incluida</div><div class="v">GTP-200B-4, pasiva, 200 MHz</div></div>
+  </div></div>
+  <a class="top" href="#top">↑ Inicio</a>
+</section>
+
+<footer>
+  <p>Guía del osciloscopio digital GW Instek GDS-2202E, resumida del manual de usuario de la serie GDS-2000E.<br>
+  El manual oficial y el encargado del laboratorio mandan sobre esta guía.<br>
+  Versión 1.0 · Agosto de 2026.</p>
+</footer>
+
+</div>
+
+<div class="fs" id="fs" hidden>
+  <div class="fs-rot" id="fsRot">
+    <button class="fs-close" id="fsClose" type="button">Cerrar ✕</button>
+    <span class="fs-tip" id="fsTip">Toca cualquier control</span>
+    <div class="pop" id="pop" hidden></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var svg   = document.getElementById('svgPanel');
+  var host  = document.getElementById('panelHost');
+  var fs    = document.getElementById('fs');
+  var rot   = document.getElementById('fsRot');
+  var pop   = document.getElementById('pop');
+  var tip   = document.getElementById('fsTip');
+  var rows  = Array.prototype.slice.call(document.querySelectorAll('.row'));
+  var ctls  = Array.prototype.slice.call(document.querySelectorAll('.ctl'));
+  var VB_FULL = {minx:0, miny:0, w:1000, h:500};
+  /* Recorte: la carcasa sin el margen exterior. */
+  var VB_CROP = {minx:6, miny:6, w:988, h:488};
+  var VB_MINX = VB_FULL.minx, VB_MINY = VB_FULL.miny, VB_W = VB_FULL.w, VB_H = VB_FULL.h;
+  var RATIO = VB_W / VB_H, activeId = null, activeG = null;
+
+  function setCrop(on){
+    var vb = on ? VB_CROP : VB_FULL;
+    VB_MINX = vb.minx; VB_MINY = vb.miny; VB_W = vb.w; VB_H = vb.h;
+    RATIO = VB_W / VB_H;
+    svg.setAttribute('viewBox', vb.minx + ' ' + vb.miny + ' ' + vb.w + ' ' + vb.h);
+  }
+
+  function viewportSize(){
+    var vv = window.visualViewport;
+    var w = (vv && vv.width)  || window.innerWidth  || document.documentElement.clientWidth;
+    var h = (vv && vv.height) || window.innerHeight || document.documentElement.clientHeight;
+    return {w:w, h:h};
+  }
+
+  function sizeFS(){
+    if(fs.hidden) return;
+    var v = viewportSize();
+    fs.style.width  = v.w + 'px';
+    fs.style.height = v.h + 'px';
+    /* "contain" (min): el panel completo siempre cabe, sin recortar. */
+    var w = (v.h >= v.w) ? Math.min(v.h, v.w * RATIO) : Math.min(v.w, v.h * RATIO);
+    rot.style.width  = w + 'px';
+    rot.style.height = 'auto';
+  }
+
+  var DATA = {};
+  rows.forEach(function(r){
+    var id = r.id.replace(/^c-/,'');
+    DATA[id] = {
+      badge: r.querySelector('.badge').textContent,
+      title: r.querySelector('.nm').textContent,
+      short: r.getAttribute('data-short') || r.querySelector('.lcd p').textContent
+    };
+  });
+
+  function highlight(id){
+    activeId = id;
+    ctls.forEach(function(g){ g.classList.toggle('on', g.dataset.id === id); });
+  }
+
+  rows.forEach(function(r){
+    r.addEventListener('toggle', function(){
+      if(r.open) rows.forEach(function(o){ if(o !== r) o.open = false; });
+      var open = null;
+      rows.forEach(function(o){ if(o.open) open = o.id.replace(/^c-/,''); });
+      if(fs.hidden) highlight(open);
+    });
+  });
+
+  function hidePop(){ pop.hidden = true; activeG = null; highlight(null); }
+
+  function placePop(g){
+    var b = g.getBBox();
+    var sc = svg.getBoundingClientRect().width / VB_W;
+    if(!sc) return;
+    var W = rot.clientWidth, H = rot.clientHeight;
+    var bx = (b.x - VB_MINX)*sc, by = (b.y - VB_MINY)*sc, bw = b.width*sc, bh = b.height*sc;
+
+    pop.style.fontSize = Math.max(9, Math.min(15, W*0.0185)) + 'px';
+    pop.style.maxWidth = Math.min(W*0.32, 290) + 'px';
+    pop.style.left = '0px'; pop.style.top = '0px';
+
+    var pw = pop.offsetWidth, ph = pop.offsetHeight;
+    var gap = Math.max(8, W*0.012), left, top, cls;
+
+    if(bx + bw + gap + pw <= W - 6){ left = bx + bw + gap; cls = 'pr'; }
+    else if(bx - gap - pw >= 6){ left = bx - gap - pw; cls = 'pl'; }
+    else {
+      left = Math.min(Math.max(bx + bw/2 - pw/2, 6), Math.max(6, W - pw - 6));
+      cls = (by + bh + gap + ph <= H - 6) ? 'pb' : 'pt';
+    }
+    if(cls === 'pr' || cls === 'pl') top = by + bh/2 - ph/2;
+    else if(cls === 'pb') top = by + bh + gap;
+    else top = by - gap - ph;
+    top = Math.min(Math.max(top, 6), Math.max(6, H - ph - 6));
+
+    pop.className = 'pop ' + cls;
+    pop.style.left = left + 'px';
+    pop.style.top  = top + 'px';
+    pop.style.setProperty('--cy', Math.min(Math.max(by + bh/2 - top, 10), Math.max(10, ph - 10)) + 'px');
+  }
+
+  function showPop(g){
+    var d = DATA[g.dataset.id];
+    if(!d) return;
+    if(activeG === g){ hidePop(); return; }
+    activeG = g;
+    pop.innerHTML = '<h4><span class="num">'+d.badge+'</span>'+d.title+'</h4><p>'+d.short+'</p>';
+    pop.hidden = false;
+    highlight(g.dataset.id);
+    placePop(g);
+    tip.style.visibility = 'hidden';
+  }
+
+  ctls.forEach(function(g){
+    function go(e){
+      if(e) e.stopPropagation();
+      if(!fs.hidden){ showPop(g); return; }
+      var r = document.getElementById('c-' + g.dataset.id);
+      if(!r) return;
+      r.open = true;
+      r.scrollIntoView({block:'center', behavior:'smooth'});
+    }
+    g.addEventListener('click', go);
+    g.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(e); }
+    });
+  });
+
+  var zoom = document.getElementById('zoom');
+  function openFS(){
+    rot.insertBefore(svg, rot.firstChild);
+    fs.hidden = false;
+    document.body.classList.add('lock');
+    tip.style.visibility = 'visible';
+    highlight(null);
+    setCrop(true);
+    sizeFS();
+    try{
+      var p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+      if(p && p.then) p.then(function(){
+        if(screen.orientation && screen.orientation.lock){
+          var q = screen.orientation.lock('landscape');
+          if(q && q.catch) q.catch(function(){});
+        }
+      }).catch(function(){});
+    }catch(e){}
+  }
+  function closeFS(){
+    hidePop();
+    host.appendChild(svg);
+    fs.hidden = true;
+    fs.style.width = ''; fs.style.height = '';
+    rot.style.width = ''; rot.style.height = '';
+    setCrop(false);
+    document.body.classList.remove('lock');
+    try{
+      if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+      if(document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+    }catch(e){}
+  }
+  zoom.addEventListener('click', openFS);
+  document.getElementById('fsClose').addEventListener('click', function(e){ e.stopPropagation(); closeFS(); });
+  fs.addEventListener('click', function(){ if(!pop.hidden) hidePop(); });
+  pop.addEventListener('click', function(e){ e.stopPropagation(); });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape' || fs.hidden) return;
+    if(!pop.hidden) hidePop(); else closeFS();
+  });
+
+  function reflow(){
+    sizeFS();
+    if(!fs.hidden && activeG) placePop(activeG);
+  }
+  window.addEventListener('resize', reflow);
+  window.addEventListener('orientationchange', function(){ setTimeout(reflow, 250); });
+  if(window.visualViewport){ window.visualViewport.addEventListener('resize', reflow); }
+
+  window.addEventListener('beforeprint', function(){
+    if(!fs.hidden) closeFS();
+    document.querySelectorAll('details').forEach(function(d){ d.open = true; });
+  });
+})();
+</script>
+</body>
+</html>
